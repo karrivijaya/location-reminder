@@ -1,16 +1,41 @@
 package com.udacity.project4
 
 import android.app.Application
+import android.view.View
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
+import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.RecyclerViewActions
+import androidx.test.espresso.matcher.PreferenceMatchers.withTitle
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.locationreminders.data.ReminderDataSource
+import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.local.LocalDB
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
+import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
+import com.udacity.project4.util.DataBindingIdlingResource
+import com.udacity.project4.util.monitorActivity
+import com.udacity.project4.utils.EspressoIdlingResource
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers
+import org.hamcrest.Matcher
+import org.junit.After
 import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
@@ -27,6 +52,9 @@ class RemindersActivityTest :
 
     private lateinit var repository: ReminderDataSource
     private lateinit var appContext: Application
+
+    // An idling resource that waits for Data Binding to have no pending bindings.
+    private val dataBindingIdlingResource = DataBindingIdlingResource()
 
     /**
      * As we use Koin as a Service Locator Library to develop our code, we'll also use Koin to test our code.
@@ -65,7 +93,71 @@ class RemindersActivityTest :
         }
     }
 
+    /**
+     * Idling resources tell Espresso that the app is idle or busy. This is needed when operations
+     * are not scheduled in the main Looper (for example when executed on a different thread).
+     */
+    @Before
+    fun registerIdlingResource() {
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
+        IdlingRegistry.getInstance().register(dataBindingIdlingResource)
+    }
 
-//    TODO: add End to End testing to the app
+    /**
+     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
+     */
+    @After
+    fun unregisterIdlingResource() {
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
+        IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
+    }
 
+    @Test
+    fun addReminder_saveReminder() {
+        runBlocking {
+
+            // Start up Tasks screen.
+            val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+            dataBindingIdlingResource.monitorActivity(activityScenario)
+
+            //click on add reminder FAB
+            onView(withId(R.id.addReminderFAB)).perform(click())
+
+            // replace text and description to the given text and description
+            onView(withId(R.id.reminderTitle)).perform(replaceText("Title 1"))
+            onView(withId(R.id.reminderDescription)).perform(replaceText("Description 1"))
+
+            onView(withId(R.id.selectLocation)).perform(setTextInTextView("Location 1"))
+
+            onView(withId(R.id.saveReminder)).perform(click())
+
+            onView(withText("Title 1")).check(matches(isDisplayed()))
+            onView(withText("Description 1")).check(matches(isDisplayed()))
+            onView(withText("Location 1")).check(matches(isDisplayed()))
+
+        }
+    }
 }
+
+
+ // from stack overflow
+fun setTextInTextView(value: String): ViewAction {
+    return object : ViewAction {
+        override fun getConstraints(): Matcher<View> {
+            return CoreMatchers.allOf(ViewMatchers.isDisplayed(), ViewMatchers.isAssignableFrom(TextView::class.java))
+        }
+
+        override fun perform(uiController: UiController, view: View) {
+            (view as TextView).text = value
+        }
+
+        override fun getDescription(): String {
+            return "replace text"
+        }
+    }
+}
+
+
+
+
+

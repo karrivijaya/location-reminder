@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
@@ -40,12 +41,19 @@ fun sendNotification(context: Context, reminderDataItem: ReminderDataItem) {
     val notificationPendingIntent = stackBuilder
         .getPendingIntent(getUniqueId(), PendingIntent.FLAG_UPDATE_CURRENT)
 
+    val mapImage = BitmapFactory.decodeResource(
+        context.resources,
+        R.drawable.location
+    )
+
 //    build the notification object with the data to be shown
     val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
         .setSmallIcon(R.mipmap.ic_launcher)
         .setContentTitle(reminderDataItem.title)
-        .setContentText(reminderDataItem.location)
+        .setContentText(context.getString(R.string.content_text,
+            reminderDataItem.location))
         .setContentIntent(notificationPendingIntent)
+        .setLargeIcon(mapImage)
         .setAutoCancel(true)
         .build()
 
