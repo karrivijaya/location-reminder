@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:gravity="start"
             android:layout_marginTop="@dimen/margin_large"
-            android:text="@string/you_have_reached"
+            android:text="@string/you_are_near"
             android:textSize="@dimen/text_size_large"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
