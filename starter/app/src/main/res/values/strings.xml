@@ -50,6 +50,6 @@
     <string name="permission_cancel">CANCEL</string>
 
     <string name="content_text">You have reached <xliff:g id="geofence_location">%1$s</xliff:g>.</string>
-    <string name="you_have_reached">You have reached</string>
+    <string name="you_are_near">You are near</string>
 
 </resources>

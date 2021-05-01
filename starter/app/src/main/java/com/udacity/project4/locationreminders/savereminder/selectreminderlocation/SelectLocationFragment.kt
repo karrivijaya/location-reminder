@@ -36,6 +36,7 @@ import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 private const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 33
@@ -47,7 +48,7 @@ private const val ZOOMLEVEL = 15F
 class SelectLocationFragment : BaseFragment() , OnMapReadyCallback {
 
     //Use Koin to get the view model of the SaveReminder
-    override val _viewModel by sharedViewModel<SaveReminderViewModel>()
+    override val _viewModel : SaveReminderViewModel by inject()
     private lateinit var binding: FragmentSelectLocationBinding
     private lateinit var map :GoogleMap
     private var pointOfInterest: PointOfInterest? = null

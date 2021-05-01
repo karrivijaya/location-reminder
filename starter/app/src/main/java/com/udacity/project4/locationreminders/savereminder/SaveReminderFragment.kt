@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
@@ -26,6 +27,7 @@ import com.udacity.project4.databinding.FragmentSaveReminderBinding
 import com.udacity.project4.locationreminders.geofence.GeofenceBroadcastReceiver
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.util.concurrent.TimeUnit
 
@@ -44,9 +46,14 @@ class SaveReminderFragment : BaseFragment() {
     }
 
     //Get the view model this time as a single to be shared with the another fragment
-    override val _viewModel by sharedViewModel<SaveReminderViewModel>()
+    override val _viewModel : SaveReminderViewModel by inject()
     private lateinit var binding: FragmentSaveReminderBinding
     private lateinit var reminderDataItem: ReminderDataItem
+    private var title: String? = null
+    private var desc: String? = null
+    private var location: String? = null
+    private var latitude: Double? = null
+    private var longitude: Double? = null
 
     private val runningQOrLater = android.os.Build.VERSION.SDK_INT >=
             android.os.Build.VERSION_CODES.Q
@@ -82,8 +89,30 @@ class SaveReminderFragment : BaseFragment() {
             _viewModel.navigationCommand.value =
                     NavigationCommand.To(SaveReminderFragmentDirections.actionSaveReminderFragmentToSelectLocationFragment())
         }
+
+        _viewModel.reminderTitle.observe(viewLifecycleOwner, Observer {
+            title = it
+        })
+
+        _viewModel.reminderDescription.observe(viewLifecycleOwner, Observer {
+            desc = it
+        })
+
+        _viewModel.reminderSelectedLocationStr.observe(viewLifecycleOwner, Observer{
+            location = it
+        })
+
+        _viewModel.latitude.observe(viewLifecycleOwner, Observer{
+            latitude = it
+        })
+
+        _viewModel.longitude.observe(viewLifecycleOwner, Observer {
+            longitude = it
+        })
+
+
         binding.saveReminder.setOnClickListener {
-            reminderDataItem = populateFields()
+            reminderDataItem = ReminderDataItem(title, desc, location, latitude, longitude)
             Log.d("ReminderDataItem", reminderDataItem.toString())
 
             if(_viewModel.validateEnteredData(reminderDataItem))
