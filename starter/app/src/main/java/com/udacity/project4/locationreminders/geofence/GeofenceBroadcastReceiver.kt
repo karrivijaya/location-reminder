@@ -23,7 +23,7 @@ import com.udacity.project4.utils.errorMessage
 
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-
+        Log.d("BroadCastReceiver", "onReceive called")
         GeofenceTransitionsJobIntentService.enqueueWork(context,intent)
     }
 }

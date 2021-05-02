@@ -38,11 +38,9 @@ class SaveReminderFragment : BaseFragment() {
         internal const val ACTION_GEOFENCE_EVENT =
                 "LocationReminders.saveReminderFragment.action.ACTION_GEOFENCE_EVENT"
         private const val TAG = "SaveReminderFragment"
-        private const val GEOFENCE_RADIUS_IN_METERS = 150f
+        private const val GEOFENCE_RADIUS_IN_METERS = 250f // Geo fence set to 250 metres
         private const val REQUEST_BACKGROUND_PERMISSION_REQUEST_CODE = 30
         val GEOFENCE_EXPIRATION_IN_MILLISECONDS: Long = TimeUnit.HOURS.toMillis(24)
-
-
     }
 
     //Get the view model this time as a single to be shared with the another fragment
@@ -60,15 +58,15 @@ class SaveReminderFragment : BaseFragment() {
 
     private lateinit var geofencingClient: GeofencingClient// A PendingIntent for the Broadcast Receiver that handles geofence transitions.
     private val geofencePendingIntent: PendingIntent by lazy {
-        val intent = Intent(requireContext(), GeofenceBroadcastReceiver::class.java)
+        val intent = Intent(requireActivity(), GeofenceBroadcastReceiver::class.java)
         intent.action = ACTION_GEOFENCE_EVENT
-        PendingIntent.getBroadcast(requireContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        PendingIntent.getBroadcast(requireActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
+    ): View{
         binding =
                 DataBindingUtil.inflate(inflater, R.layout.fragment_save_reminder, container, false)
 
@@ -212,14 +210,5 @@ class SaveReminderFragment : BaseFragment() {
         super.onDestroy()
         //make sure to clear the view model after destroy, as it's a single view model.
         _viewModel.onClear()
-    }
-
-    private fun populateFields(): ReminderDataItem{
-        val title = _viewModel.reminderTitle.value
-        val description = _viewModel.reminderDescription.value
-        val location = _viewModel.reminderSelectedLocationStr.value
-        val latitude = _viewModel.latitude.value
-        val longitude = _viewModel.longitude.value
-        return ReminderDataItem(title, description, location, latitude,longitude)
     }
 }

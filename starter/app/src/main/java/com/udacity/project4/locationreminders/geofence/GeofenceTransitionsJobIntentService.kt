@@ -40,9 +40,6 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
     }
 
     override fun onHandleWork(intent: Intent) {
-        //TODO: handle the geofencing transition events and
-        // send a notification to the user when he enters the geofence area
-        //TODO call @sendNotification
 
         if (intent.action == ACTION_GEOFENCE_EVENT) {
             val geofencingEvent = GeofencingEvent.fromIntent(intent)
@@ -53,8 +50,7 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
             }
             val geofenceTransition = geofencingEvent.geofenceTransition
             val triggeringGeofences: MutableList<Geofence> = mutableListOf()
-            if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER
-                    || geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL) {
+            if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
                 Log.v("GeoJobIntentService","Geo fence entered")
 
                 if(geofencingEvent.triggeringGeofences.isNotEmpty()){
