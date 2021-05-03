@@ -86,6 +86,19 @@ class ReminderListFragmentTest : AutoCloseKoinTest() {// Extended Koin Test - em
         }
     }
 
+    @Test
+    fun reminderList_withoutReminders_showNoData() {
+        val scenario = launchFragmentInContainer<ReminderListFragment>(Bundle.EMPTY, R.style.AppTheme)
+
+        val navController = mock(NavController::class.java)
+
+        scenario.onFragment {
+            Navigation.setViewNavController(it.view!!, navController)
+        }
+
+        onView(withId(R.id.noDataTextView)).check(matches(isDisplayed()))
+    }
+
 
     @Test
     fun reminderList_DisplayedInUI() {

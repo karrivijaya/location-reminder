@@ -113,6 +113,47 @@ class RemindersActivityTest :
     }
 
     @Test
+    fun saveReminder_noTitle_displaySnackbar() {
+        runBlocking {
+            // Start up Tasks screen.
+            val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+            dataBindingIdlingResource.monitorActivity(activityScenario)
+
+            //click on add reminder FAB
+            onView(withId(R.id.addReminderFAB)).perform(click())
+
+            // replace text and description to the given text and description
+            onView(withId(R.id.reminderDescription)).perform(replaceText("Description 1"))
+
+            onView(withId(R.id.selectLocation)).perform(setTextInTextView("Location 1"))
+
+            onView(withId(R.id.saveReminder)).perform(click())
+
+            onView(withText("Please enter title")).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)))
+        }
+    }
+
+    @Test
+    fun saveReminder_noLocation_displaySnackbar() {
+        runBlocking {
+            // Start up Tasks screen.
+            val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+            dataBindingIdlingResource.monitorActivity(activityScenario)
+
+            //click on add reminder FAB
+            onView(withId(R.id.addReminderFAB)).perform(click())
+
+            onView(withId(R.id.reminderTitle)).perform(replaceText("Title 1"))
+            // replace text and description to the given text and description
+            onView(withId(R.id.reminderDescription)).perform(replaceText("Description 1"))
+
+            onView(withId(R.id.saveReminder)).perform(click())
+
+            onView(withText("Please select location")).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)))
+        }
+    }
+
+    @Test
     fun addReminder_saveReminder() {
         runBlocking {
 
@@ -134,7 +175,6 @@ class RemindersActivityTest :
             onView(withText("Title 1")).check(matches(isDisplayed()))
             onView(withText("Description 1")).check(matches(isDisplayed()))
             onView(withText("Location 1")).check(matches(isDisplayed()))
-
         }
     }
 }
