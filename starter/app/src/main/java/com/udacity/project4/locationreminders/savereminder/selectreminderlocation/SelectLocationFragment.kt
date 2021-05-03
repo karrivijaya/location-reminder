@@ -38,6 +38,7 @@ import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import java.util.*
 
 private const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 33
 private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
@@ -104,15 +105,45 @@ class SelectLocationFragment : BaseFragment() , OnMapReadyCallback {
         map = googleMap
         checkForForeGroundPermission()
         setMapStyle(map)
+        setOnMapClick(map)
         setPoiClick(map)
+    }
+    
+    private fun setOnMapClick(map:GoogleMap){
+        map.setOnMapClickListener { latLng ->
+            map.clear()
+            val snippet = String.format(
+                    Locale.getDefault(),
+                    "Lat: %1$.5f, Long: %2$.5f",
+                    latLng.latitude,
+                    latLng.longitude
+            )
+            val clickMarker = map.addMarker(
+                    MarkerOptions()
+                            .position(latLng)
+                            .title(getString(R.string.pointOfInterest))
+                            .snippet(snippet)
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET))
+            )
+            clickMarker.showInfoWindow()
+            pointOfInterest = PointOfInterest(latLng, "point of interest","Point of Interest")
+        }
+        
     }
     private fun setPoiClick(map: GoogleMap){
         map.setOnPoiClickListener { poi ->
             map.clear()
+            val snippet = String.format(
+                    Locale.getDefault(),
+                    "Lat: %1$.5f, Long: %2$.5f",
+                    poi.latLng.latitude,
+                    poi.latLng.longitude
+            )
             val poiMarker = map.addMarker(
                 MarkerOptions()
                     .position(poi.latLng)
                     .title(poi.name)
+                        .snippet(snippet)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET))
             )
             poiMarker.showInfoWindow()
